@@ -1,0 +1,68 @@
+def generate_key_matrix(keyword):
+keyword = keyword.upper().replace('J', 'I')
+seen = set()
+matrix = []
+for char in keyword:
+if char not in seen and char.isalpha():
+seen.add(char)
+matrix.append(char)
+for char in 'ABCDEFGHIKLMNOPQRSTUVWXYZ':
+if char not in seen:
+matrix.append(char)
+return [matrix[i*5:(i+1)*5] for i in range(5)]
+
+def preprocess_text(text):
+text = text.upper().replace('J', 'I').replace(" ", "")
+processed = ""
+i = 0
+while i < len(text):
+a = text[i]
+b = text[i+1] if i+1 < len(text) else 'X'
+if a == b:
+processed += a + 'X'
+i += 1
+else:
+processed += a + b
+i += 2
+if len(processed) % 2 != 0:
+processed += 'X'
+return [processed[i:i+2] for i in range(0, len(processed), 2)]
+
+def find_position(matrix, letter):
+for row in range(5):
+for col in range(5):
+if matrix[row][col] == letter:
+return row, col
+return None
+
+def encrypt_pair(pair, matrix):
+r1, c1 = find_position(matrix, pair[0])
+r2, c2 = find_position(matrix, pair[1])
+if r1 == r2:
+return matrix[r1][(c1+1)%5] + matrix[r2][(c2+1)%5]
+elif c1 == c2:
+return matrix[(r1+1)%5][c1] + matrix[(r2+1)%5][c2]
+else:
+return matrix[r1][c2] + matrix[r2][c1]
+
+def playfair_encrypt(plaintext, keyword):
+matrix = generate_key_matrix(keyword)
+digraphs = preprocess_text(plaintext)
+ciphertext = ""
+for pair in digraphs:
+ciphertext += encrypt_pair(pair, matrix)
+return ciphertext
+
+# Main
+if __name__ == "__main__":
+keyword = input("Enter the keyword: ")
+plaintext = input("Enter the plaintext: ")
+
+ciphertext = playfair_encrypt(plaintext, keyword)
+print("Encrypted text:", ciphertext)
+
+Sample input :-
+Enter the keyword: MONARCHY
+Enter the plaintext: HELLO WORLD
+Sample output :-
+Encrypted text: KCTUPMVOMTUZ
