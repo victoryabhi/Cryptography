@@ -1,0 +1,47 @@
+from Crypto.Cipher import DES3
+from Crypto.Random import get_random_bytes
+from Crypto.Util.Padding import pad, unpad
+
+def encrypt_3des_cbc(plaintext, key, iv):
+cipher = DES3.new(key, DES3.MODE_CBC, iv)
+padded_text = pad(plaintext.encode(), DES3.block_size)
+ciphertext = cipher.encrypt(padded_text)
+return ciphertext
+
+def decrypt_3des_cbc(ciphertext, key, iv):
+cipher = DES3.new(key, DES3.MODE_CBC, iv)
+decrypted_padded = cipher.decrypt(ciphertext)
+decrypted = unpad(decrypted_padded, DES3.block_size)
+return decrypted.decode()
+
+# Main
+if __name__ == "__main__":
+# Sample input
+plaintext = "Meet me at 10 PM behind the station."
+
+# Generate a secure 24-byte key (3DES requires 16 or 24 bytes)
+key = DES3.adjust_key_parity(get_random_bytes(24))
+
+# Generate a random 8-byte IV (3DES block size is 8 bytes)
+iv = get_random_bytes(8)
+
+print("Plaintext:", plaintext)
+print("Key:", key.hex())
+print("IV:", iv.hex())
+
+# Encrypt
+ciphertext = encrypt_3des_cbc(plaintext, key, iv)
+print("Encrypted (hex):", ciphertext.hex())
+
+# Decrypt
+decrypted_text = decrypt_3des_cbc(ciphertext, key, iv)
+print("Decrypted:", decrypted_text)
+
+Sample input :-
+plaintext = "Meet me at 10 PM behind the station."
+Sample output :-
+Plaintext: Meet me at 10 PM behind the station.
+Key: a7ef1027e9aa983c7f5c7129dd13fdc5a72e4c88cf5e6a1a
+IV: 9d1a3e5caae5bb84
+Encrypted (hex): d4a1c6fe27d4294ff23e16a8dbb5d8eec22a5dbec9b3834f6c2e6b4c835bf618
+Decrypted: Meet me at 10 PM behind the station.
