@@ -1,0 +1,72 @@
+import numpy as np
+
+def mod_inverse(a, m):
+"""Find modular inverse of a under modulo m."""
+for i in range(1, m):
+if (a * i) % m == 1:
+return i
+return None
+
+def matrix_mod_inverse(matrix, mod):
+"""Calculate the modular inverse of a 2x2 matrix under mod."""
+det = int(np.round(np.linalg.det(matrix))) % mod
+det_inv = mod_inverse(det, mod)
+if det_inv is None:
+raise ValueError("Matrix is not invertible under mod 26.")
+
+# Adjugate of 2x2 matrix
+adj = np.array([[matrix[1][1], -matrix[0][1]],
+[-matrix[1][0], matrix[0][0]]])
+inv = (det_inv * adj) % mod
+return inv
+
+def text_to_numbers(text):
+"""Convert text to numbers (A=0, B=1, ..., Z=25)."""
+return [ord(c) - ord('A') for c in text.upper() if c.isalpha()]
+
+def numbers_to_text(numbers):
+"""Convert numbers back to text (0=A, 1=B, ..., 25=Z)."""
+return ''.join([chr(n % 26 + ord('A')) for n in numbers])
+
+def hill_encrypt(plaintext, key_matrix):
+"""Encrypt plaintext using Hill cipher and key matrix."""
+nums = text_to_numbers(plaintext)
+if len(nums) % 2 != 0:
+nums.append(ord('X') - ord('A'))  # Padding if needed
+
+ciphertext = []
+for i in range(0, len(nums), 2):
+pair = np.array([[nums[i]], [nums[i + 1]]])
+result = np.dot(key_matrix, pair) % 26
+ciphertext.extend(result.flatten())
+return numbers_to_text(ciphertext)
+
+def hill_decrypt(ciphertext, key_matrix):
+"""Decrypt ciphertext using Hill cipher and key matrix."""
+nums = text_to_numbers(ciphertext)
+inverse_key = matrix_mod_inverse(key_matrix, 26)
+
+decrypted = []
+for i in range(0, len(nums), 2):
+pair = np.array([[nums[i]], [nums[i + 1]]])
+result = np.dot(inverse_key, pair) % 26
+decrypted.extend(result.flatten())
+return numbers_to_text(decrypted)
+
+# Main function
+if __name__ == "__main__":
+plaintext = "meet me at the usual place at ten rather than eight oclock"
+key_matrix = np.array([[9, 4], [5, 7]])
+
+encrypted = hill_encrypt(plaintext, key_matrix)
+print("Encrypted text:", encrypted)
+
+decrypted = hill_decrypt(encrypted, key_matrix)
+print("Decrypted text:", decrypted)
+
+
+Sample input :-
+plaintext = "MEET ME AT THE USUAL PLACE AT TEN RATHER THAN EIGHT OCLOCK" key_matrix = np.array([[9, 4], [5, 7]])
+Sample output :-
+Encryptedtext: HZICPWYGMRXIBKFXAUNWGRXBOBEWUXYQHPHEULRLHENMEWMFDI
+Decrypted text: MEETMEATTHEUSUALPLACEATTENRATHERTHANEIGHTOCLOCKX
