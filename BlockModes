@@ -1,0 +1,74 @@
+from Crypto.Cipher import DES
+from Crypto.Random import get_random_bytes
+
+BLOCK_SIZE = 8  # DES block size in bytes
+
+def pad_message(msg):
+""" Pad with 0x80 followed by 0x00 to next block size """
+pad_len = BLOCK_SIZE - (len(msg) % BLOCK_SIZE)
+return msg + b'\x80' + b'\x00' * (pad_len - 1)
+
+def unpad_message(padded):
+""" Remove padding: find 0x80 from end """
+if b'\x80' not in padded:
+return padded
+return padded[:padded.rfind(b'\x80')]
+
+def encrypt_ecb(plaintext, key):
+cipher = DES.new(key, DES.MODE_ECB)
+return cipher.encrypt(pad_message(plaintext))
+
+def decrypt_ecb(ciphertext, key):
+cipher = DES.new(key, DES.MODE_ECB)
+return unpad_message(cipher.decrypt(ciphertext))
+
+def encrypt_cbc(plaintext, key, iv):
+cipher = DES.new(key, DES.MODE_CBC, iv)
+return cipher.encrypt(pad_message(plaintext))
+
+def decrypt_cbc(ciphertext, key, iv):
+cipher = DES.new(key, DES.MODE_CBC, iv)
+return unpad_message(cipher.decrypt(ciphertext))
+
+def encrypt_cfb(plaintext, key, iv):
+cipher = DES.new(key, DES.MODE_CFB, iv, segment_size=8*BLOCK_SIZE)
+return cipher.encrypt(pad_message(plaintext))
+
+def decrypt_cfb(ciphertext, key, iv):
+cipher = DES.new(key, DES.MODE_CFB, iv, segment_size=8*BLOCK_SIZE)
+return unpad_message(cipher.decrypt(ciphertext))
+
+if __name__ == "__main__":
+plaintext = b"HELLO123"  # 8 bytes (already a full block, but still padded)
+key = get_random_bytes(8)  # DES key = 8 bytes
+iv = get_random_bytes(8)   # IV also 8 bytes
+
+print("Original:", plaintext)
+
+# ECB
+ecb_ct = encrypt_ecb(plaintext, key)
+print("ECB Encrypted:", ecb_ct.hex())
+print("ECB Decrypted:", decrypt_ecb(ecb_ct, key))
+
+# CBC
+cbc_ct = encrypt_cbc(plaintext, key, iv)
+print("CBC Encrypted:", cbc_ct.hex())
+print("CBC Decrypted:", decrypt_cbc(cbc_ct, key, iv))
+
+# CFB
+cfb_ct = encrypt_cfb(plaintext, key, iv)
+print("CFB Encrypted:", cfb_ct.hex())
+print("CFB Decrypted:", decrypt_cfb(cfb_ct, key, iv))
+
+Sample input :-
+plaintext = b"HELLO123"
+user_input = input("Enter the plaintext (minimum 1                                  character): ")
+plaintext = user_input.encode('utf-8')
+Sample output :-
+Original: b'HELLO123'
+ECB Encrypted: 5b6f54b45b8e92f1b89e912cd372d469
+ECB Decrypted: b'HELLO123'
+CBC Encrypted: cdd2c40f8f29647cb4b5298b84597818
+CBC Decrypted: b'HELLO123'
+CFB Encrypted: 9bd7d86bfb77cfaa83bbef2b54618b48
+CFB Decrypted: b'HELLO123'
