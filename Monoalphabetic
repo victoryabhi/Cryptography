@@ -1,0 +1,36 @@
+def monoalphabetic_encrypt(plaintext, key):
+"""
+Encrypts the plaintext using monoalphabetic substitution cipher.
+"""
+ciphertext = ""
+alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+key_map = dict(zip(alphabet, key))  # Map A-Z to key letters
+
+for char in plaintext:
+if char.isalpha():
+if char.isupper():
+ciphertext += key_map[char]
+else:
+ciphertext += key_map[char.upper()].lower()
+else:
+ciphertext += char  # Keep punctuation, digits, spaces unchanged
+return ciphertext
+
+
+# Main function
+if __name__ == "__main__":
+# 26 unique uppercase letters (cipher alphabet)
+key = "QWERTYUIOPASDFGHJKLZXCVBNM"
+
+# Validate key
+if len(key) != 26 or not key.isalpha() or len(set(key)) != 26:
+print("Invalid key. Must be 26 unique alphabetic characters.")
+else:
+plaintext = input("Enter the plaintext: ")
+encrypted_text = monoalphabetic_encrypt(plaintext, key)
+print("Encrypted text:", encrypted_text)
+
+Sample input :-
+Enter the plaintext: Hello World!
+Sample output :-
+Encrypted text: Itssg Vgksf!
