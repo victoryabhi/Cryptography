@@ -1,0 +1,33 @@
+def caesar_cipher_encrypt(text, key):
+result = ""
+
+for char in text:
+if char.isalpha():
+# Shift uppercase characters
+if char.isupper():
+shifted = (ord(char) - ord('A') + key) % 26 + ord('A')
+# Shift lowercase characters
+else:
+shifted = (ord(char) - ord('a') + key) % 26 + ord('a')
+result += chr(shifted)
+else:
+# Non-alphabetic characters remain unchanged
+result += char
+
+return result
+
+# Main program
+if __name__ == "__main__":
+plaintext = input("Enter the plaintext: ")
+key = int(input("Enter the key (1-25): "))
+
+if 1 <= key <= 25:
+encrypted = caesar_cipher_encrypt(plaintext, key)
+print("Encrypted text:", encrypted)
+else:
+print("Invalid key. Please enter a number between 1 and 25.")
+Sample input :-
+Enter the plaintext: Hello World!
+Enter the key (1-25): 3
+Sample output :-
+Encrypted text: Khoor Zruog!
