@@ -1,0 +1,61 @@
+# Function to compute power mod q (efficient computation of a^b mod q)
+def power_mod(base, exp, mod):
+result = 1
+while exp > 0:
+if exp % 2 == 1:
+result = (result * base) % mod
+base = (base * base) % mod
+exp //= 2
+return result
+
+# Diffie-Hellman Key Exchange
+def diffie_hellman_protocol(a, q, x_alice, x_bob):
+# Alice computes A = a^x_Alice % q
+A = power_mod(a, x_alice, q)
+
+# Bob computes B = a^x_Bob % q
+B = power_mod(a, x_bob, q)
+
+# Alice computes the shared key using B
+shared_key_alice = power_mod(B, x_alice, q)
+
+# Bob computes the shared key using A
+shared_key_bob = power_mod(A, x_bob, q)
+
+return A, B, shared_key_alice, shared_key_bob
+
+# ---- Test Data ----
+if __name__ == "__main__":
+# Public values
+a = 2   # Base, public number
+q = 23  # Prime modulus
+
+# Secret values chosen by Alice and Bob
+x_alice = 6  # Alice's private key
+x_bob = 15   # Bob's private key
+
+# Run Diffie-Hellman Protocol
+A, B, shared_key_alice, shared_key_bob = diffie_hellman_protocol(a, q, x_alice, x_bob)
+
+# Output results
+print(f"Alice sends A = {A}")
+print(f"Bob sends B = {B}")
+print(f"Alice computes the shared key: {shared_key_alice}")
+print(f"Bob computes the shared key: {shared_key_bob}")
+
+# Verify both keys are the same
+if shared_key_alice == shared_key_bob:
+print("Key exchange successful, shared key:", shared_key_alice)
+else:
+print("Key exchange failed")
+
+Sample output :-    Public values:
+a=2 (Base)
+q=23 (Prime modulus)
+Alice's private key: xAlice​=6
+Bob's private key: xBob​=15
+Sample output :- Alice sends A = 13
+Bob sends B = 6
+Alice computes the shared key: 18
+Bob computes the shared key: 18
+Key exchange successful, shared key: 18
