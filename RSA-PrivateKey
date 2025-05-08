@@ -1,0 +1,63 @@
+# Function to compute gcd using Euclidean algorithm
+def gcd(a, b):
+while b:
+a, b = b, a % b
+return a
+
+# Function to find the modular inverse of a number using Extended Euclidean Algorithm
+def mod_inverse(a, m):
+m0, x0, x1 = m, 0, 1
+while a > 1:
+q = a // m
+m, a = a % m, m
+x0, x1 = x1 - q * x0, x0
+if x1 < 0:
+x1 += m0
+return x1
+
+# Function to find prime factors of n using trial and error
+def find_prime_factors(n):
+for i in range(2, int(n ** 0.5) + 1):
+if n % i == 0:
+return i, n // i
+return None, None
+
+# Function to compute RSA private key d
+def rsa_private_key(e, n):
+# Step 1: Find p and q
+p, q = find_prime_factors(n)
+if p is None or q is None:
+return "Cannot find prime factors"
+
+# Step 2: Compute Euler's Totient Function f(n)
+f_n = (p - 1) * (q - 1)
+
+# Step 3: Find the multiplicative inverse of e modulo f(n)
+d = mod_inverse(e, f_n)
+return d, p, q, f_n
+
+# ---- Test Data ----
+if __name__ == "__main__":
+# Public key values
+e = 31
+n = 3599
+
+# Find the private key
+private_key, p, q, f_n = rsa_private_key(e, n)
+
+# Output the private key and factors
+if isinstance(private_key, tuple):
+print(f"Private Key (d): {private_key[0]}")
+print(f"Prime Factors (p, q): {p}, {q}")
+print(f"Euler's Totient Function (f(n)): {f_n}")
+else:
+print(private_key)
+
+Sample input :-
+Public Key:
+e=31
+n=3599
+Sample output :-
+Private Key (d): 1791
+Prime Factors (p, q): 59, 61
+Euler's Totient Function (f(n)): 3480
